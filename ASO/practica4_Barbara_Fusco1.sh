@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Comprobar si es el, script está siendo ejecutado por root
+# Comprobar si es el script está siendo ejecutado por root
+# sino salimos del programa
 if [ $(id -u) != 0 ]; then
 	echo "Este script sólo puede ejecutarse como root"
 	exit 1
