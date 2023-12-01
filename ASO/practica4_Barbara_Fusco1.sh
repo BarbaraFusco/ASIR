@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Comprobar si es el script está siendo ejecutado por root
-# sino salimos del programa
+# Sino salimos del programa
 if [ $(id -u) != 0 ]; then
 	echo "Este script sólo puede ejecutarse como root"
 	exit 1
@@ -19,10 +19,10 @@ for paquetesDisponibles in "${paquetes[@]}" ; do
 
 	# Comprobamos si el paquete se instala con apt o con snap
 	if apt show $nombrePaquete &> /dev/null; then
-		#echo "El instalador para $nombrePaquete es apt..."
+		echo "El instalador para $nombrePaquete es apt..."
 		instalador="apt"
 	elif snap info $nombrePaquete &> /dev/null; then
-		#echo "El instalador para $nombrePaquete es snap..."
+		echo "El instalador para $nombrePaquete es snap..."
 		instalador="snap"
 	fi
 
@@ -41,26 +41,26 @@ for paquetesDisponibles in "${paquetes[@]}" ; do
 		# En caso de que sea snap
 		else
 		    if ! dpkg -l | grep -q "^ii  $nombrePaquete" ; then
+				# Algunos programas no se pueden instalar sin la opción --classic porque fueron diseñados originalmente para ser ejecutados fuera del entorno confinado de Snap y requieren un acceso más amplio al sistema.
            		sudo $instalador install "$nombrePaquete"
-				if [[ $? != 0 ]] ; then
-					echo "$nombrePaquete no se instaló correctamente"
-				else
-           			echo "$nombrePaquete se ha instalado correctamente"
-				fi
         	else
            		echo "El paquete ya se encuentra instalado"
         	fi
-
   		fi
+		# En caso de que la acción a realizar sea 'remove', se elimina
 	elif [[ "$accion" == 'remove' ]] ; then
+			# Verificar si el programa está instalado. Aquellos que empiecen por ii están instalados.
         	if dpkg -l | grep -q "^ii  $nombrePaquete" ; then
+				# Eliminar el paquete
            		sudo apt purge -y  "$nombrePaquete"
            		echo "$nombrePaquete se ha desinstalado correctamente"
         	else
           		echo "$nombrePaquete no está instalado"
         	fi
 	fi
+	# En caso de que la acción sea status, se verificará el estado del programa (si está o no instalado)
    	if [[ "$accion" == 'status' ]] ; then
+			# Verificar si el programa está instalado
         	if dpkg -l | grep -q "^ii  $nombrePaquete "; then
                 	echo "$nombrePaquete está instalado."
         	else
